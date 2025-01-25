@@ -1,119 +1,129 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useState } from 'react';
-const applicants = [
-    {
-      name: "John Doe",
-      email: "john.doe@example.com",
-      experience: 3,
-      resume: "https://res.cloudinary.com/demo/resume/john_doe_resume.pdf",
-      status: "New",
-    },
-    {
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      experience: 5,
-      resume: "https://res.cloudinary.com/demo/resume/jane_smith_resume.pdf",
-      status: "Evaluated",
-    },
-    {
-      name: "Alice Johnson",
-      email: "alice.johnson@example.com",
-      experience: 2,
-      resume: "https://res.cloudinary.com/demo/resume/alice_johnson_resume.pdf",
-      status: "Hired",
-    },
-    {
-      name: "Robert Brown",
-      email: "robert.brown@example.com",
-      experience: 8,
-      resume: "https://res.cloudinary.com/demo/resume/robert_brown_resume.pdf",
-      status: "Rejected",
-    },
-    {
-      name: "Emily Davis",
-      email: "emily.davis@example.com",
-      experience: 1,
-      resume: "https://res.cloudinary.com/demo/resume/emily_davis_resume.pdf",
-      status: "New",
-    },
-    {
-      name: "Michael Wilson",
-      email: "michael.wilson@example.com",
-      experience: 4,
-      resume: "https://res.cloudinary.com/demo/resume/michael_wilson_resume.pdf",
-      status: "Evaluated",
-    },
-    {
-      name: "Sophia Lee",
-      email: "sophia.lee@example.com",
-      experience: 6,
-      resume: "https://res.cloudinary.com/demo/resume/sophia_lee_resume.pdf",
-      status: "Hired",
-    },
-    {
-      name: "James Taylor",
-      email: "james.taylor@example.com",
-      experience: 7,
-      resume: "https://res.cloudinary.com/demo/resume/james_taylor_resume.pdf",
-      status: "Rejected",
-    },
-  ];
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useEffect } from 'react';
+
   
-  export default function Home(){
-  const [applicant, setApplicant] = useState(applicants);
+
+export default function Home() {
+  const navigate = useNavigate();
   const [updateStatus, setUpdateStatus] = useState(false);
-  const [status, setStatus] = useState("New");
-  const handleUpdateStatus = (id) => {
-      setUpdateStatus(true);
-      
-  }
- 
+  const [applicants, setApplicants] = useState([]);
+  const [selectedId, setSelectedId] = useState("");
+  const [status, setStatus] = useState("");
+
+  const handleUpdateStatus = (id, newStatus) => {
+    const token = localStorage.getItem("token");
+    axios.patch(`https://worko-br76.onrender.com/referrals/update/${id}`,{status:newStatus},{
+      headers:{
+        Authorization:`Bearer ${token}`,
+        "Content-Type":"application/json"
+      }
+    })
+    .then((res)=>{
+      console.log(res.data)
+      GetAllReferral();
+      setSelectedId("");
+      setStatus("");
+      setUpdateStatus(false);
+      alert(res.data.msg)
+    })      
+    .catch((err)=>{
+      console.log(err)
+    })
+    
+  };
+
+  const handleAddReferral = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/addReferral");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const GetAllReferral = () => {
+    const token = localStorage.getItem("token");
+    axios
+      .get("https://worko-br76.onrender.com/referrals/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        setApplicants(res.data);
+        console.log("Referrals fetched successfully:", res.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching referrals:", err);
+      });
+  };
+
+  useEffect(() => {
+    GetAllReferral();
+  }, []);
+
   return (
-      <Container>
-          <Div>
-          <p><b>All Referral</b></p>
-          <Button>Add Referral</Button>
-          </Div>
-          <Div2>
-             
-              <Div3>
-                  {applicants.map((applicant) => (
-                      <ApplicantCard key={applicant.id}>
-                         
-                              <h3>Name: {applicant.name}</h3>
-                              <p>Email: {applicant.email}</p>
-                              <p>Experience: {applicant.experience} years</p>
-                              {updateStatus ? (
-                                  <select onChange={(e) => setStatus(e.target.value)}>
-                                  <option value="New">New</option>
-                                  <option value="Evaluated">Evaluated</option>
-                                  <option value="Hired">Hired</option>
-                                  <option value="Rejected">Rejected</option>
-                                  </select>
-                              ):(
-                                  <p>Status: {applicant.status}</p>
-                              )}
-                              {updateStatus ? (   
-                                  <button onClick={() =>  handleUpdateStatus(applicant.id)}>update status</button>
-                              ):(
-                                  <button  >update status</button>
-                              )}
-
-                         
-                      </ApplicantCard>
-                  ))}
-              </Div3>
-
-              
-          </Div2>
-      </Container>
+    <Container>
+      <Div>
+        <p><b>All Referrals</b></p>
+        <Button onClick={handleAddReferral}>Add Referral</Button>
+      </Div>
+      <Div2>
+        <Div3>
+          {applicants &&
+            applicants.map((applicant) => (
+              <ApplicantCard key={applicant._id}>
+                <h3>Name: {applicant.name}</h3>
+                <p>Email: {applicant.email}</p>
+                <p>Experience: {applicant.experience} years</p>
+                {selectedId === applicant._id ? (
+                  <>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                    >
+                      <option value="">Select Status</option>
+                      <option value="New">New</option>
+                      <option value="Evaluated">Evaluated</option>
+                      <option value="Hired">Hired</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                    <button
+                      onClick={() => handleUpdateStatus(applicant._id, status)}
+                    >
+                        
+                      Save Status
+                    </button>
+                    <br/>
+                    <button onClick={() => setSelectedId("")}>Cancel</button>
+                  </>
+                ) : (
+                  <>
+                    <p>Status: {applicant.status}</p>
+                    <button onClick={() => setSelectedId(applicant._id)}>
+                      Update Status
+                    </button>
+                  </>
+                )}
+              </ApplicantCard>
+            ))}
+        </Div3>
+      </Div2>
+    </Container>
   );
-};   
+}
+
 
 const Container = styled.div`
 width: 100%;
 text-align: center;
+margin-top:20PX;
+
 `
 const Div = styled.div`
 width: 60%;
@@ -146,12 +156,24 @@ background-color:transparent;
 border: 1px solid #000;
 border-radius: 10px;
 padding: 20px;
+
+select{
+    width: 80%;
+    margin: auto;
+    padding: 10px;
+    border-radius: 10px;
+    display: block;
+    margin-top: 10px;
+}
  button{
     background-color: #197b99;
     color: #fff;
     border: none;
     border-radius: 15px;
-    padding: 7px;
+    padding: 10px;
+  
+    margin-top: 10px;
+
  }
 `
 

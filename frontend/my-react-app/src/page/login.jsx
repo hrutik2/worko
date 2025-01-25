@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -10,6 +11,7 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const navigate=useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -19,31 +21,21 @@ const Login = () => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData)
-    // try {
-    //   const response = await fetch('http://localhost:8080/user/login', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(formData)
-    //   });
-      
-    //   const data = await response.json();
-      
-    //   if (response.ok) {
-    //     localStorage.setItem('token', data.token);
-    //     // You can add navigation logic here
-    //     alert('Login successful!');
-    //   } else {
-    //     setError(data.msg || 'Login failed');
-    //   }
-    // } catch (error) {
-    //   setError('Something went wrong. Please try again.');
-    //   console.error('Login error:', error);
-    // }
+    axios.post('https://worko-br76.onrender.com/user/login', formData)
+    .then((res) => {
+        console.log(res.data)
+        alert(res.data.msg)
+        localStorage.setItem('token', res.data.token)
+        navigate('/home')
+    })
+    .catch((err) => {
+        alert(err.response.data.msg)
+    })
+   
+   
   };
 
   return (
@@ -51,7 +43,7 @@ const Login = () => {
       <Title>Login</Title>
       <Form onSubmit={handleSubmit}>
         <Input
-          type="email"
+          type="text"
           name="email"
           placeholder="Email"
           value={formData.email}
@@ -59,7 +51,7 @@ const Login = () => {
           required
         />
         <Input
-          type="password"
+          type="text"
           name="password"
           placeholder="Password"
           value={formData.password}

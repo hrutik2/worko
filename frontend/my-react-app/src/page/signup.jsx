@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-
+import axios from 'axios';  
 
 
 
 const Signup = () => {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: ''
   });
@@ -19,31 +20,19 @@ const Signup = () => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit =  (e) => {
     e.preventDefault();
     console.log(formData)
-    // try {
-    //   const response = await fetch('http://localhost:8080/user/login', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(formData)
-    //   });
-      
-    //   const data = await response.json();
-      
-    //   if (response.ok) {
-    //     localStorage.setItem('token', data.token);
-    //     // You can add navigation logic here
-    //     alert('Login successful!');
-    //   } else {
-    //     setError(data.msg || 'Login failed');
-    //   }
-    // } catch (error) {
-    //   setError('Something went wrong. Please try again.');
-    //   console.error('Login error:', error);
-    // }
+    axios.post('https://worko-br76.onrender.com/user/register', formData)
+    .then((res) => {
+        console.log(res)
+        alert(res.data.msg)
+    })
+    .catch((err) => {
+        console.log(err)
+    })  
+   
+   
   };
 
   return (
@@ -59,7 +48,7 @@ const Signup = () => {
           required
         />
         <Input
-          type="email"
+          type="text"
           name="email"
           placeholder="Email"
           value={formData.email}
@@ -67,7 +56,7 @@ const Signup = () => {
           required
         />
         <Input
-          type="password"
+          type="text"
           name="password"
           placeholder="Password"
           value={formData.password}
