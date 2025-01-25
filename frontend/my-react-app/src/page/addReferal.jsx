@@ -54,16 +54,21 @@ const AddReferral = () => {
         e.preventDefault();
 
         console.log(formData)
-        // try {
-        //     const response = await axios.post('http://localhost:8080/api/referrals', formData);
-        //     if (response.status === 201) {
-        //         alert('Referral added successfully!');
-        //         navigate('/referrals');
-        //     }
-        // } catch (error) {
-        //     console.error('Error submitting referral:', error);
-        //     alert('Error adding referral. Please try again.');
-        // }
+        const token=localStorage.getItem("token");
+        axios.post('https://worko-br76.onrender.com/referrals/create', formData,{
+            headers:{
+                "Authorization":`Bearer ${token}`,
+                "Content-Type":"application/json"
+            }
+        })
+        .then((res)=>{
+            console.log(res.data)
+            alert(res.data.msg)
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+       
     };
 
     return (

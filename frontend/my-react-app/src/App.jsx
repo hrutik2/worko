@@ -1,16 +1,19 @@
 import { useState } from 'react'
 import AddReferral from './page/addReferal'
 import Login from './page/login'
-import Home from './page/home'
+import Signup from './page/signup'
+import { Navbar } from './component/Navbar'
+import { AllRoutes } from './component/AllRoutes'
+
+
 function App() {
-  const [count, setCount] = useState(0)
+ 
 
   return (
-    <>
-     <Home />
-      <Login />
-      <AddReferral />
-    </>
+    <div>
+     <Navbar/>
+     <AllRoutes/>
+    </div>
   )
 }
 
