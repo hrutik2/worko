@@ -10,7 +10,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    
     const formData = {
       email: email,
       password: password,
@@ -33,23 +33,22 @@ const Login = () => {
   return (
     <Container>
       <Title>Login</Title>
-
-      <Input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
       
-      />
-      <Input
-        type="text"
-        name="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <Button onClick={handleSubmit}>Login</Button>
+      <Form onSubmit={handleSubmit}>
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button type="submit" >Login</Button>
+      </Form>
     </Container>
   );
 };
