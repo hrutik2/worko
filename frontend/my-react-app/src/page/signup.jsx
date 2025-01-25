@@ -104,8 +104,8 @@ const Input = styled.input`
   border-bottom: 2px solid #646cff;
   
   background: transparent;
-  color: white;
-  font-size: 16px;
+  
+ 
   
   &:focus {
     outline: none;
